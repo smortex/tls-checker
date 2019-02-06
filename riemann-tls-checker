@@ -192,6 +192,8 @@ class CertificateChecker
       25
     elsif @hostname.start_with?('imap.')
       143
+    elsif @hostname.start_with?('puppet.')
+      8140
     else
       443
     end
