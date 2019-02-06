@@ -116,6 +116,8 @@ class CertificateChecker
   def tls_socket
     @tls_socket ||= if @hostname.start_with?('smtp.')
                       smtp_socket
+                    elsif @hostname.start_with?('imap.')
+                      imap_socket
                     else
                       basic_socket
                     end
@@ -129,6 +131,28 @@ class CertificateChecker
     rescue OpenSSL::SSL::SSLError # rubocop:disable Lint/HandleExceptions
       # This may fail for example if a client certificate is required
     end
+    ssl_socket
+  end
+
+  def imap_socket
+    socket = LineOrientedSocket.new(@hostname, port)
+    loop do
+      line = socket.gets
+      break if line.start_with?('* OK ')
+    end
+    socket.puts('. CAPABILITY')
+    loop do
+      line = socket.gets
+      break if line.start_with?('. OK')
+    end
+    socket.puts('. STARTTLS')
+    loop do
+      line = socket.gets
+      break if line.start_with?('. OK')
+    end
+
+    ssl_socket = OpenSSL::SSL::SSLSocket.new(socket, ssl_context)
+    ssl_socket.connect
     ssl_socket
   end
 
@@ -166,6 +190,8 @@ class CertificateChecker
   def port
     if @hostname.start_with?('smtp.')
       25
+    elsif @hostname.start_with?('imap.')
+      143
     else
       443
     end
