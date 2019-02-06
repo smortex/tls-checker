@@ -224,5 +224,12 @@ ARGV.each do |hostname|
     cc = CertificateChecker.new(hostname)
     puts cc.to_e
   rescue UnableToGetCertificate
+    e = {
+      state: 'critical',
+      description: 'Cannot fetch certificate',
+      service: "X.509/#{hostname}",
+    }
+
+    puts e
   end
 end
