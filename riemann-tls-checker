@@ -1,0 +1,176 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'active_support/time_with_zone'
+require 'action_view'
+require 'action_view/helpers'
+
+require 'openssl'
+require 'socket'
+
+class UnableToGetCertificate < RuntimeError
+end
+
+class LineOrientedSocket < TCPSocket
+  def gets
+    line = ''
+
+    line += read(1) until line.end_with?("\r\n")
+
+    line
+  end
+
+  def puts(data)
+    send("#{data}\r\n", 0)
+  end
+end
+
+class CertificateChecker
+  include ActionView::Helpers::DateHelper
+
+  def initialize(hostname)
+    @hostname = hostname
+  end
+
+  def to_e
+    {
+      state: state,
+      metric: metric,
+      description: description,
+      service: "X.509/#{@hostname}",
+      subject: certificate&.subject.to_s,
+      issuer: certificate&.issuer.to_s,
+      serial: certificate&.serial.to_i,
+      not_before: certificate&.not_before.to_s,
+      not_after: certificate&.not_after.to_s,
+    }
+  end
+
+  def to_s
+    description
+  end
+
+  private
+
+  def description
+    if !certificate
+      "#{@hostname} does not have a valid certificate"
+    elsif !match_domain?
+      'certificate subject does not match hostname'
+    elsif not_valid_yet?
+      "certificate will become valid in #{distance_of_time_in_words_to_now(certificate.not_before)}"
+    else
+      "certificate will expire in #{distance_of_time_in_words_to_now(certificate.not_before)}"
+    end
+  end
+
+  def state
+    if !match_domain? || not_valid_yet? || expired_or_expire_soon?
+      'critical'
+    elsif expire_soonish?
+      'warn'
+    else
+      'ok'
+    end
+  end
+
+  def metric
+    certificate.not_after - now if certificate
+  end
+
+  def now
+    @now ||= Time.now
+  end
+
+  def not_valid_yet?
+    now < certificate.not_before
+  end
+
+  def expired_or_expire_soon?
+    now + 3600 * 24 * 2 > certificate&.not_after
+  end
+
+  def expire_soonish?
+    now + 3600 * 24 * 14 > certificate&.not_after
+  end
+
+  def match_domain?
+    domain == @hostname
+  end
+
+  def domain
+    certificate.subject.to_a.select { |data| data[0] == 'CN' }.map { |data| data[1] }.first if certificate
+  end
+
+  def certificate
+    @certificate ||= OpenSSL::X509::Certificate.new(tls_socket.peer_cert)
+  rescue Exception => e
+    raise UnableToGetCertificate.new(e)
+  end
+
+  def tls_socket
+    @tls_socket ||= if @hostname.start_with?('smtp.')
+                      smtp_socket
+                    else
+                      basic_socket
+                    end
+  end
+
+  def basic_socket
+    ssl_socket = OpenSSL::SSL::SSLSocket.new(TCPSocket.new(@hostname, port), ssl_context)
+    ssl_socket.hostname = @hostname
+    begin
+      ssl_socket.connect
+    rescue OpenSSL::SSL::SSLError # rubocop:disable Lint/HandleExceptions
+      # This may fail for example if a client certificate is required
+    end
+    ssl_socket
+  end
+
+  def smtp_socket
+    socket = LineOrientedSocket.new(@hostname, port)
+    loop do
+      line = socket.gets
+      break if line.start_with?('220 ')
+    end
+    socket.puts("EHLO #{my_hostname}")
+    loop do
+      line = socket.gets
+      break if line.start_with?('250 ')
+    end
+    socket.puts('STARTTLS')
+    socket.gets
+
+    ssl_socket = OpenSSL::SSL::SSLSocket.new(socket, ssl_context)
+    ssl_socket.connect
+    ssl_socket
+  end
+
+  def my_hostname
+    Socket.gethostbyname(Socket.gethostname).first
+  end
+
+  def ssl_context
+    ssl_context = OpenSSL::SSL::SSLContext.new
+    # We do not care about trust here, only expiration.
+    # YOU SHALL NOT COPY-PASTE THE FOLLOWING LINE IN YOUR CODE
+    ssl_context.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    ssl_context
+  end
+
+  def port
+    if @hostname.start_with?('smtp.')
+      25
+    else
+      443
+    end
+  end
+end
+
+ARGV.each do |hostname|
+  begin
+    cc = CertificateChecker.new(hostname)
+    puts cc.to_e
+  rescue UnableToGetCertificate
+  end
+end
