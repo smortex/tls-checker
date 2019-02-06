@@ -95,7 +95,12 @@ class CertificateChecker
   end
 
   def match_domain?
-    domain == @hostname
+    return true if domain == @hostname
+
+    san = certificate.extensions.select { |ext| ext.oid == 'subjectAltName' }.first
+    return san.value.split(', ').map { |name| name.sub(/\ADNS:/, '') }.include?(@hostname) if san
+
+    false
   end
 
   def domain
