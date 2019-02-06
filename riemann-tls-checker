@@ -172,7 +172,7 @@ class CertificateChecker
   end
 
   def ldap_socket
-    ldap = Net::LDAP.new(host: @address, port: port, encryption: :start_tls)
+    ldap = Net::LDAP.new(host: @address, port: port, encryption: { method: :start_tls, tls_options: tls_options })
 
     ldap.open do |conn|
       return conn.instance_variable_get(:@open_connection).instance_variable_get(:@conn)
@@ -225,8 +225,14 @@ class CertificateChecker
     # DISCOVER THAT YOU HAVE WAY  MORE PROBLEMS  THAN YOU THOUGH.   I WILL BE
     # PLEASED TO  EXCHANGE MONEY WITH ADVICES AND ASSISTANCE  FOR FIXING YOUR
     # PROBLEMS.
-    ssl_context.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    ssl_context.set_params(tls_options)
     ssl_context
+  end
+
+  def tls_options
+    {
+      verify_mode: OpenSSL::SSL::VERIFY_NONE,
+    }
   end
 
   def port
