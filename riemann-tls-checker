@@ -10,9 +10,6 @@ require 'openssl'
 require 'resolv'
 require 'socket'
 
-class UnableToGetCertificate < RuntimeError
-end
-
 class LineOrientedSocket < TCPSocket
   def gets
     line = ''
@@ -46,17 +43,23 @@ class CertificateChecker
   end
 
   def to_e
-    {
+    event = {
       state: state,
       metric: metric,
       description: description,
       service: "X.509/#{@hostname}/#{@address}",
-      subject: certificate&.subject.to_s,
-      issuer: certificate&.issuer.to_s,
-      serial: certificate&.serial.to_i,
-      not_before: certificate&.not_before.to_s,
-      not_after: certificate&.not_after.to_s,
     }
+    if certificate
+      event.merge!(
+        subject: certificate&.subject.to_s,
+        issuer: certificate&.issuer.to_s,
+        serial: certificate&.serial.to_i,
+        not_before: certificate&.not_before.to_s,
+        not_after: certificate&.not_after.to_s,
+      )
+    end
+
+    event
   end
 
   def to_s
@@ -121,9 +124,10 @@ class CertificateChecker
   end
 
   def certificate
-    @certificate ||= OpenSSL::X509::Certificate.new(tls_socket.peer_cert)
-  rescue Exception => e
-    raise UnableToGetCertificate.new(e)
+    @certificate = OpenSSL::X509::Certificate.new(tls_socket.peer_cert) if @certificate.nil?
+    @certificate
+  rescue Errno::ECONNREFUSED
+    @certificate = false
   end
 
   def tls_socket
@@ -254,16 +258,6 @@ factory = CertificateCheckerFactory.new
 
 ARGV.each do |hostname|
   factory.certificate_checkers_for(hostname).each do |checker|
-    begin
-      puts checker.to_e
-    rescue UnableToGetCertificate
-      e = {
-        state: 'critical',
-        description: 'Cannot fetch certificate',
-        service: "X.509/#{hostname}",
-      }
-
-      puts e
-    end
+    puts checker.to_e
   end
 end
