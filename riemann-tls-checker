@@ -7,6 +7,7 @@ require 'action_view/helpers'
 require 'net/ldap'
 
 require 'openssl'
+require 'resolv'
 require 'socket'
 
 class UnableToGetCertificate < RuntimeError
@@ -26,11 +27,22 @@ class LineOrientedSocket < TCPSocket
   end
 end
 
+class CertificateCheckerFactory
+  def initialize
+    @resolver = Resolv::DNS.new
+  end
+
+  def certificate_checkers_for(hostname)
+    @resolver.getaddresses(hostname).map { |ip| CertificateChecker.new(hostname, ip.to_s) }
+  end
+end
+
 class CertificateChecker
   include ActionView::Helpers::DateHelper
 
-  def initialize(hostname)
+  def initialize(hostname, address)
     @hostname = hostname
+    @address = address
   end
 
   def to_e
@@ -38,7 +50,7 @@ class CertificateChecker
       state: state,
       metric: metric,
       description: description,
-      service: "X.509/#{@hostname}",
+      service: "X.509/#{@hostname}/#{@address}",
       subject: certificate&.subject.to_s,
       issuer: certificate&.issuer.to_s,
       serial: certificate&.serial.to_i,
@@ -127,7 +139,7 @@ class CertificateChecker
   end
 
   def basic_socket
-    ssl_socket = OpenSSL::SSL::SSLSocket.new(TCPSocket.new(@hostname, port), ssl_context)
+    ssl_socket = OpenSSL::SSL::SSLSocket.new(TCPSocket.new(@address, port), ssl_context)
     ssl_socket.hostname = @hostname
     begin
       ssl_socket.connect
@@ -138,7 +150,7 @@ class CertificateChecker
   end
 
   def imap_socket
-    socket = LineOrientedSocket.new(@hostname, port)
+    socket = LineOrientedSocket.new(@address, port)
     loop do
       line = socket.gets
       break if line.start_with?('* OK ')
@@ -160,7 +172,7 @@ class CertificateChecker
   end
 
   def ldap_socket
-    ldap = Net::LDAP.new(host: @hostname, port: port, encryption: :start_tls)
+    ldap = Net::LDAP.new(host: @address, port: port, encryption: :start_tls)
 
     ldap.open do |conn|
       return conn.instance_variable_get(:@open_connection).instance_variable_get(:@conn)
@@ -168,7 +180,7 @@ class CertificateChecker
   end
 
   def smtp_socket
-    socket = LineOrientedSocket.new(@hostname, port)
+    socket = LineOrientedSocket.new(@address, port)
     loop do
       line = socket.gets
       break if line.start_with?('220 ')
@@ -232,17 +244,20 @@ class CertificateChecker
   end
 end
 
-ARGV.each do |hostname|
-  begin
-    cc = CertificateChecker.new(hostname)
-    puts cc.to_e
-  rescue UnableToGetCertificate
-    e = {
-      state: 'critical',
-      description: 'Cannot fetch certificate',
-      service: "X.509/#{hostname}",
-    }
+factory = CertificateCheckerFactory.new
 
-    puts e
+ARGV.each do |hostname|
+  factory.certificate_checkers_for(hostname).each do |checker|
+    begin
+      puts checker.to_e
+    rescue UnableToGetCertificate
+      e = {
+        state: 'critical',
+        description: 'Cannot fetch certificate',
+        service: "X.509/#{hostname}",
+      }
+
+      puts e
+    end
   end
 end
