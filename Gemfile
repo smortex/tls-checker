@@ -4,3 +4,4 @@ source 'https://rubygems.org'
 
 gem 'actionview'
 gem 'activesupport'
+gem 'net-ldap'

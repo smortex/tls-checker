@@ -4,6 +4,7 @@
 require 'active_support/time_with_zone'
 require 'action_view'
 require 'action_view/helpers'
+require 'net/ldap'
 
 require 'openssl'
 require 'socket'
@@ -118,6 +119,8 @@ class CertificateChecker
                       smtp_socket
                     elsif @hostname.start_with?('imap.')
                       imap_socket
+                    elsif @hostname.start_with?('ldap.')
+                      ldap_socket
                     else
                       basic_socket
                     end
@@ -154,6 +157,14 @@ class CertificateChecker
     ssl_socket = OpenSSL::SSL::SSLSocket.new(socket, ssl_context)
     ssl_socket.connect
     ssl_socket
+  end
+
+  def ldap_socket
+    ldap = Net::LDAP.new(host: @hostname, port: port, encryption: :start_tls)
+
+    ldap.open do |conn|
+      return conn.instance_variable_get(:@open_connection).instance_variable_get(:@conn)
+    end
   end
 
   def smtp_socket
@@ -211,6 +222,8 @@ class CertificateChecker
       25
     elsif @hostname.start_with?('imap.')
       143
+    elsif @hostname.start_with?('ldap.')
+      389
     elsif @hostname.start_with?('puppet.')
       8140
     else
