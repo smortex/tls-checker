@@ -16,7 +16,7 @@ class LineOrientedSocket < TCPSocket
   def gets
     line = ''
 
-    line += read(1) until line.end_with?("\r\n")
+    line += recv(1) until line.end_with?("\r\n")
 
     line
   end
