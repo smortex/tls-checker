@@ -70,7 +70,7 @@ class CertificateChecker
 
   def description
     if !certificate
-      "#{@hostname} does not have a valid certificate"
+      @certificate_failure || "#{@hostname} does not have a valid certificate"
     elsif !match_domain?
       'certificate subject does not match hostname'
     elsif not_valid_yet?
@@ -111,6 +111,7 @@ class CertificateChecker
   end
 
   def match_domain?
+    return false unless certificate
     return true if domain == @hostname
 
     san = certificate.extensions.select { |ext| ext.oid == 'subjectAltName' }.first
@@ -126,7 +127,8 @@ class CertificateChecker
   def certificate
     @certificate = OpenSSL::X509::Certificate.new(tls_socket.peer_cert) if @certificate.nil?
     @certificate
-  rescue Errno::ECONNREFUSED
+  rescue Errno::ECONNREFUSED, Errno::ETIMEDOUT, Net::LDAP::ConnectionRefusedError => e
+    @certificate_failure = e.message
     @certificate = false
   end
 
