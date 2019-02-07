@@ -73,12 +73,12 @@ class CertificateChecker
   private
 
   def service
-    format('X.509/%s/%s:%d', @hostname, humanized_address, port)
+    format('X.509/%<hostname>s/%<address>s:%<port>d', hostname: @hostname, address: humanized_address, port: port)
   end
 
   def humanized_address
     if @address.is_a?(Resolv::IPv6)
-      "[#{@address.to_s}]"
+      "[#{@address}]"
     else
       @address.to_s
     end
