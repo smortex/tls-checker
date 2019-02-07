@@ -12,6 +12,16 @@ require 'resolv'
 require 'riemann/client'
 require 'socket'
 
+class Now
+  include Singleton
+
+  def initialize
+    @now = Time.now
+  end
+
+  attr_reader :now
+end
+
 class LineOrientedSocket < TCPSocket
   def gets
     line = ''
@@ -111,7 +121,7 @@ class CertificateChecker
   end
 
   def now
-    @now ||= Time.now
+    Now.instance.now
   end
 
   def not_valid_yet?
