@@ -88,7 +88,7 @@ class CertificateChecker
     elsif not_valid_yet?
       "certificate will become valid in #{distance_of_time_in_words_to_now(certificate.not_before)}"
     else
-      "certificate will expire in #{distance_of_time_in_words_to_now(certificate.not_before)}"
+      "certificate will expire in #{distance_of_time_in_words_to_now(certificate.not_after)}"
     end
   end
 
