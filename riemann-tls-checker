@@ -30,7 +30,7 @@ class CertificateCheckerFactory
   end
 
   def certificate_checkers_for(hostname)
-    @resolver.getaddresses(hostname).map { |ip| CertificateChecker.new(hostname, ip.to_s) }
+    @resolver.getaddresses(hostname).map { |ip| CertificateChecker.new(hostname, ip) }
   end
 end
 
@@ -46,7 +46,7 @@ class CertificateChecker
     event = {
       state: state,
       description: description,
-      service: "X.509/#{@hostname}/#{@address}",
+      service: service,
     }
     if certificate
       event.merge!(
@@ -67,6 +67,18 @@ class CertificateChecker
   end
 
   private
+
+  def service
+    format('X.509/%s/%s:%d', @hostname, humanized_address, port)
+  end
+
+  def humanized_address
+    if @address.is_a?(Resolv::IPv6)
+      "[#{@address.to_s}]"
+    else
+      @address.to_s
+    end
+  end
 
   def description
     if !certificate
@@ -145,7 +157,7 @@ class CertificateChecker
   end
 
   def basic_socket
-    ssl_socket = OpenSSL::SSL::SSLSocket.new(TCPSocket.new(@address, port), ssl_context)
+    ssl_socket = OpenSSL::SSL::SSLSocket.new(TCPSocket.new(@address.to_s, port), ssl_context)
     ssl_socket.hostname = @hostname
     begin
       ssl_socket.connect
@@ -156,7 +168,7 @@ class CertificateChecker
   end
 
   def imap_socket
-    socket = LineOrientedSocket.new(@address, port)
+    socket = LineOrientedSocket.new(@address.to_s, port)
     loop do
       line = socket.gets
       break if line.start_with?('* OK ')
@@ -178,7 +190,7 @@ class CertificateChecker
   end
 
   def ldap_socket
-    ldap = Net::LDAP.new(host: @address, port: port, encryption: { method: :start_tls, tls_options: tls_options })
+    ldap = Net::LDAP.new(host: @address.to_s, port: port, encryption: { method: :start_tls, tls_options: tls_options })
 
     ldap.open do |conn|
       return conn.instance_variable_get(:@open_connection).instance_variable_get(:@conn)
@@ -186,7 +198,7 @@ class CertificateChecker
   end
 
   def smtp_socket
-    socket = LineOrientedSocket.new(@address, port)
+    socket = LineOrientedSocket.new(@address.to_s, port)
     loop do
       line = socket.gets
       break if line.start_with?('220 ')
