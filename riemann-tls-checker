@@ -149,7 +149,7 @@ class CertificateChecker
   end
 
   def tls_socket
-    @tls_socket ||= if @hostname.start_with?('smtp.')
+    @tls_socket ||= if @hostname.start_with?('smtp.', 'mx.')
                       smtp_socket
                     elsif @hostname.start_with?('imap.')
                       imap_socket
@@ -258,7 +258,7 @@ class CertificateChecker
   end
 
   def port
-    if @hostname.start_with?('smtp.')
+    if @hostname.start_with?('smtp.', 'mx.')
       25
     elsif @hostname.start_with?('imap.')
       143
