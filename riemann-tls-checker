@@ -45,12 +45,12 @@ class CertificateChecker
   def to_e
     event = {
       state: state,
-      metric: metric,
       description: description,
       service: "X.509/#{@hostname}/#{@address}",
     }
     if certificate
       event.merge!(
+        metric: metric,
         subject: certificate&.subject.to_s,
         issuer: certificate&.issuer.to_s,
         serial: certificate&.serial.to_i,
