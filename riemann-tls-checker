@@ -6,8 +6,10 @@ require 'action_view'
 require 'action_view/helpers'
 require 'net/ldap'
 
+require 'optparse'
 require 'openssl'
 require 'resolv'
+require 'riemann/client'
 require 'socket'
 
 class LineOrientedSocket < TCPSocket
@@ -47,6 +49,8 @@ class CertificateChecker
       state: state,
       description: description,
       service: service,
+      ttl: 3600 * 12,
+      tags: ['riemann-tls-checker'],
     }
     if certificate
       event.merge!(
@@ -268,10 +272,30 @@ class CertificateChecker
   end
 end
 
+options = {
+  riemann: {
+    host: '127.0.0.1',
+    port: 5555,
+  }
+}
+
+OptionParser.new do |opts|
+  opts.banner = 'Usage: riemann-tls-checker [options] hostname...'
+
+  opts.on('-h', '--host=HOST', 'Connect to riemann on host HOST') do |v|
+    options[:riemann][:host] = v
+  end
+  opts.on('-p', '--port=PORT', 'Connect to riemann on port PORT') do |v|
+    options[:riemann][:port] = v
+  end
+end.parse!
+
 factory = CertificateCheckerFactory.new
+
+r = Riemann::Client.new(options[:riemann])
 
 ARGV.each do |hostname|
   factory.certificate_checkers_for(hostname).each do |checker|
-    puts checker.to_e
+    r.tcp << checker.to_e
   end
 end
