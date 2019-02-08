@@ -22,17 +22,37 @@ class Now
   attr_reader :now
 end
 
+class SocketRecvTimeout < RuntimeError
+  def message
+    'Timeout while receiving message from socket'
+  end
+end
+
 class LineOrientedSocket < TCPSocket
   def gets
     line = ''
 
-    line += recv(1) until line.end_with?("\r\n")
+    line += timed_getbyte until line.end_with?("\r\n")
 
     line
   end
 
   def puts(data)
     send("#{data}\r\n", 0)
+  end
+
+  private
+
+  TIMEOUT = 10
+
+  def timed_getbyte
+    recv_nonblock(1)
+  rescue IO::EAGAINWaitReadable
+    if IO.select([self], nil, nil, 10)
+      s.recv_nonblock(1)
+    else
+      raise SocketRecvTimeout
+    end
   end
 end
 
@@ -153,7 +173,7 @@ class CertificateChecker
   def certificate
     @certificate = OpenSSL::X509::Certificate.new(tls_socket.peer_cert) if @certificate.nil?
     @certificate
-  rescue Errno::ECONNREFUSED, Errno::ETIMEDOUT, Net::LDAP::ConnectionRefusedError => e
+  rescue Errno::ECONNREFUSED, Errno::ETIMEDOUT, Net::LDAP::ConnectionRefusedError, SocketRecvTimeout => e
     @certificate_failure = e.message
     @certificate = false
   end
