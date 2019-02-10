@@ -6,3 +6,9 @@ gem 'actionview'
 gem 'activesupport'
 gem 'net-ldap'
 gem 'riemann-client'
+
+group 'testing' do
+  gem 'rake'
+  gem 'rspec'
+  gem 'simplecov'
+end
