@@ -135,4 +135,42 @@ RSpec.describe CertificateChecker do
       end
     end
   end
+
+  context '#certificate' do
+    subject do
+      CertificateCheckerFactory.new.certificate_checkers_for(specification).first
+    end
+
+    context 'connecting to a TLS service' do
+      let(:specification) { 'opus-labs.fr' }
+
+      it 'fetches a certificate' do
+        expect(subject.send(:certificate)).to be_a(OpenSSL::X509::Certificate)
+      end
+    end
+
+    context 'connecting to an IMAP server' do
+      let(:specification) { 'imap.opus-labs.fr' }
+
+      it 'fetches a certificate' do
+        expect(subject.send(:certificate)).to be_a(OpenSSL::X509::Certificate)
+      end
+    end
+
+    context 'connecting to a LDAP server' do
+      let(:specification) { 'ldap.opus-labs.fr' }
+
+      it 'fetches a certificate' do
+        expect(subject.send(:certificate)).to be_a(OpenSSL::X509::Certificate)
+      end
+    end
+
+    context 'connecting to a SMTP server' do
+      let(:specification) { 'mx.opus-labs.fr' }
+
+      it 'fetches a certificate' do
+        expect(subject.send(:certificate)).to be_a(OpenSSL::X509::Certificate)
+      end
+    end
+  end
 end
