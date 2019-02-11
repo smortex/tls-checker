@@ -64,17 +64,12 @@ class CertificateChecker
   end
 
   def description
-    if !certificate
-      @certificate_failure || "#{hostname} does not have a valid certificate"
-    elsif !valid_for_domain?
-      'certificate subject does not match hostname'
-    elsif not_valid_yet?
-      "certificate will become valid in #{distance_of_time_in_words_to_now(certificate.not_before)}"
-    elsif expired?
-      "certificate has expired #{distance_of_time_in_words_to_now(certificate.not_after)} ago"
-    else
-      "certificate will expire in #{distance_of_time_in_words_to_now(certificate.not_after)}"
-    end
+    return @certificate_failure || "#{hostname} does not have a valid certificate" unless certificate
+    return 'certificate subject does not match hostname' unless valid_for_domain?
+    return "certificate will become valid in #{distance_of_time_in_words_to_now(certificate.not_before)}" if not_valid_yet? # rubocop:disable Metrics/LineLength
+    return "certificate has expired #{distance_of_time_in_words_to_now(certificate.not_after)} ago" if expired?
+
+    "certificate will expire in #{distance_of_time_in_words_to_now(certificate.not_after)}"
   end
 
   def state
