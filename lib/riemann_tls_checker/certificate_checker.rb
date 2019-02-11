@@ -66,7 +66,7 @@ class CertificateChecker
   def description
     if !certificate
       @certificate_failure || "#{hostname} does not have a valid certificate"
-    elsif !match_domain?
+    elsif !valid_for_domain?
       'certificate subject does not match hostname'
     elsif not_valid_yet?
       "certificate will become valid in #{distance_of_time_in_words_to_now(certificate.not_before)}"
@@ -78,7 +78,7 @@ class CertificateChecker
   end
 
   def state
-    if !match_domain? || not_valid_yet? || expired_or_expire_soon?
+    if !valid_for_domain? || not_valid_yet? || expired_or_expire_soon?
       'critical'
     elsif expire_soonish?
       'warn'
@@ -111,9 +111,16 @@ class CertificateChecker
     now + 3600 * 24 * 14 > certificate&.not_after
   end
 
+  def valid_for_domain?
+    match_domain? || match_subject_alternative_name?
+  end
+
   def match_domain?
+    domain == hostname
+  end
+
+  def match_subject_alternative_name?
     return false unless certificate
-    return true if domain == hostname
 
     san = certificate.extensions.select { |ext| ext.oid == 'subjectAltName' }.first
     return san.value.split(', ').map { |name| name.sub(/\ADNS:/, '') }.include?(hostname) if san
