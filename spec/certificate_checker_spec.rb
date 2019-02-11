@@ -165,7 +165,7 @@ RSpec.describe CertificateChecker do
       end
     end
 
-    context 'connecting to a SMTP server' do
+    context 'connecting to a SMTP server', smtp: true do
       let(:specification) { 'mx.opus-labs.fr' }
 
       it 'fetches a certificate' do
