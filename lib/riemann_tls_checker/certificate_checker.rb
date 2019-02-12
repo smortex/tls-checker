@@ -195,6 +195,8 @@ class CertificateChecker
 
   def my_hostname
     Socket.gethostbyname(Socket.gethostname).first
+  rescue SocketError
+    Socket.gethostname
   end
 
   def ssl_context
