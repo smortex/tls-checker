@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'midi-smtp-server'
+
 RSpec.describe CertificateChecker do
   subject do
     CertificateChecker.new(hostname, address, port, starttls)
@@ -165,8 +167,22 @@ RSpec.describe CertificateChecker do
       end
     end
 
-    context 'connecting to a SMTP server', smtp: true do
-      let(:specification) { 'mx.opus-labs.fr' }
+    context 'connecting to a SMTP server' do
+      let(:specification) { '127.0.0.1:2525:smtp' }
+      subject do
+        CertificateChecker.new('random.fqdn', '127.0.0.1', 2525, :smtp)
+      end
+
+      before do
+        logger = Logger.new(STDOUT)
+        logger.level = Logger::WARN
+        @server = MidiSmtpServer::Smtpd.new(2525, '127.0.0.1', 4, tls_mode: :TLS_OPTIONAL, logger: logger)
+        @server.start
+      end
+
+      after do
+        @server.stop
+      end
 
       it 'fetches a certificate' do
         expect(subject.send(:certificate)).to be_a(OpenSSL::X509::Certificate)

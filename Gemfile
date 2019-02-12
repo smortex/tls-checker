@@ -8,6 +8,7 @@ gem 'net-ldap'
 gem 'riemann-client'
 
 group 'testing' do
+  gem 'midi-smtp-server'
   gem 'rake'
   gem 'rspec'
   gem 'simplecov'
