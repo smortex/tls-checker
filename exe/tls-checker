@@ -3,7 +3,7 @@
 
 require 'tls-checker'
 
-factory = CertificateCheckerFactory.new
+factory = TLSChecker::CertificateCheckerFactory.new
 
 ARGV.each do |arg|
   factory.certificate_checkers_for(arg).each do |checker|

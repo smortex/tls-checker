@@ -2,9 +2,9 @@
 
 require 'midi-smtp-server'
 
-RSpec.describe CertificateChecker do
+RSpec.describe TLSChecker::CertificateChecker do
   subject do
-    CertificateChecker.new(hostname, address, port, starttls)
+    TLSChecker::CertificateChecker.new(hostname, address, port, starttls)
   end
 
   let(:hostname) do
@@ -140,7 +140,7 @@ RSpec.describe CertificateChecker do
 
   context '#certificate' do
     subject do
-      CertificateCheckerFactory.new.certificate_checkers_for(specification).first
+      TLSChecker::CertificateCheckerFactory.new.certificate_checkers_for(specification).first
     end
 
     context 'connecting to a TLS service' do
@@ -170,7 +170,7 @@ RSpec.describe CertificateChecker do
     context 'connecting to a SMTP server' do
       let(:specification) { '127.0.0.1:2525:smtp' }
       subject do
-        CertificateChecker.new('random.fqdn', '127.0.0.1', 2525, :smtp)
+        TLSChecker::CertificateChecker.new('random.fqdn', '127.0.0.1', 2525, :smtp)
       end
 
       before do

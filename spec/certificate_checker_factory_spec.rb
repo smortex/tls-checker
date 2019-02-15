@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe CertificateCheckerFactory do
+RSpec.describe TLSChecker::CertificateCheckerFactory do
   describe '#certificate_checkers_for' do
     let(:hostname) { 'example.com' }
     let(:specification) { hostname }
@@ -11,7 +11,7 @@ RSpec.describe CertificateCheckerFactory do
 
     context 'with a random hostname' do
       it 'has proper port and starttls' do
-        expect(CertificateChecker).to receive(:new).with('example.com', :ip, 443, :raw).and_call_original
+        expect(TLSChecker::CertificateChecker).to receive(:new).with('example.com', :ip, 443, :raw).and_call_original
 
         result = subject.certificate_checkers_for(specification)
 
@@ -25,7 +25,7 @@ RSpec.describe CertificateCheckerFactory do
       let(:hostname) { 'smtp.example.com' }
 
       it 'has proper port and starttls' do
-        expect(CertificateChecker).to receive(:new).with('smtp.example.com', :ip, 25, :smtp).and_call_original
+        expect(TLSChecker::CertificateChecker).to receive(:new).with('smtp.example.com', :ip, 25, :smtp).and_call_original
 
         result = subject.certificate_checkers_for(specification)
 
@@ -39,7 +39,7 @@ RSpec.describe CertificateCheckerFactory do
       let(:hostname) { 'imap.example.com' }
 
       it 'has proper port and starttls' do
-        expect(CertificateChecker).to receive(:new).with('imap.example.com', :ip, 143, :imap).and_call_original
+        expect(TLSChecker::CertificateChecker).to receive(:new).with('imap.example.com', :ip, 143, :imap).and_call_original
 
         result = subject.certificate_checkers_for(specification)
 
@@ -53,7 +53,7 @@ RSpec.describe CertificateCheckerFactory do
       let(:hostname) { 'ldap.example.com' }
 
       it 'has proper port and starttls' do
-        expect(CertificateChecker).to receive(:new).with('ldap.example.com', :ip, 389, :ldap).and_call_original
+        expect(TLSChecker::CertificateChecker).to receive(:new).with('ldap.example.com', :ip, 389, :ldap).and_call_original
 
         result = subject.certificate_checkers_for(specification)
 
@@ -67,7 +67,7 @@ RSpec.describe CertificateCheckerFactory do
       let(:hostname) { 'puppet.example.com' }
 
       it 'has proper port and starttls' do
-        expect(CertificateChecker).to receive(:new).with('puppet.example.com', :ip, 8140, :raw).and_call_original
+        expect(TLSChecker::CertificateChecker).to receive(:new).with('puppet.example.com', :ip, 8140, :raw).and_call_original
 
         result = subject.certificate_checkers_for(specification)
 
@@ -81,7 +81,7 @@ RSpec.describe CertificateCheckerFactory do
       let(:specification) { "#{hostname}:25" }
 
       it 'has proper port and starttls' do
-        expect(CertificateChecker).to receive(:new).with('example.com', :ip, 25, :smtp).and_call_original
+        expect(TLSChecker::CertificateChecker).to receive(:new).with('example.com', :ip, 25, :smtp).and_call_original
 
         result = subject.certificate_checkers_for(specification)
 
@@ -95,7 +95,7 @@ RSpec.describe CertificateCheckerFactory do
       let(:specification) { "#{hostname}:224:smtp" }
 
       it 'has proper port and starttls' do
-        expect(CertificateChecker).to receive(:new).with('example.com', :ip, 224, :smtp).and_call_original
+        expect(TLSChecker::CertificateChecker).to receive(:new).with('example.com', :ip, 224, :smtp).and_call_original
 
         result = subject.certificate_checkers_for(specification)
 

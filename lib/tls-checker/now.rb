@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
-class Now
-  include Singleton
+module TLSChecker
+  class Now
+    include Singleton
 
-  def initialize
-    @now = Time.at(Time.now.to_i)
+    def initialize
+      @now = Time.at(Time.now.to_i)
+    end
+
+    attr_reader :now
   end
-
-  attr_reader :now
 end
