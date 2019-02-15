@@ -29,7 +29,7 @@ class CertificateChecker
       description: description,
       service: service,
       ttl: 3600 * 12,
-      tags: ['riemann-tls-checker'],
+      tags: ['tls-checker'],
     }
     if certificate
       event.merge!(

@@ -5,7 +5,6 @@ source 'https://rubygems.org'
 gem 'actionview'
 gem 'activesupport'
 gem 'net-ldap'
-gem 'riemann-client'
 
 group 'testing' do
   gem 'midi-smtp-server'
