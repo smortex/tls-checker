@@ -2,13 +2,7 @@
 
 source 'https://rubygems.org'
 
-gem 'actionview'
-gem 'activesupport'
-gem 'net-ldap'
+git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
 
-group 'testing' do
-  gem 'midi-smtp-server'
-  gem 'rake'
-  gem 'rspec'
-  gem 'simplecov'
-end
+# Specify your gem's dependencies in tls-checker.gemspec
+gemspec
