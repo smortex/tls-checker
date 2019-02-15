@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'riemann_tls_checker'
+require 'tls-checker'
 
 require 'riemann/client'
 
@@ -11,7 +11,7 @@ options = {
   riemann: {
     host: '127.0.0.1',
     port: 5555,
-  }
+  },
 }
 
 OptionParser.new do |opts|
