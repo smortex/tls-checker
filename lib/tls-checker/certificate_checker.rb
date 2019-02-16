@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-require 'action_view'
-require 'action_view/helpers'
-require 'active_support/time_with_zone'
 require 'openssl'
 require 'resolv'
 require 'net/ldap'
+require 'internet_security_event'
 
 module TLSChecker
   class CertificateChecker
@@ -25,25 +23,18 @@ module TLSChecker
     attr_reader :hostname, :address, :port, :starttls
 
     def to_e
-      event = {
-        state: state,
-        description: description,
-        service: service,
-        ttl: 3600 * 12,
-        tags: ['tls-checker'],
-      }
       if certificate
-        event.merge!(
-          metric: metric,
-          subject: certificate.subject.to_s,
-          issuer: certificate.issuer.to_s,
-          serial: certificate.serial.to_i,
-          not_before: certificate.not_before.to_s,
-          not_after: certificate.not_after.to_s
-        )
-      end
-
-      event
+        InternetSecurityEvent::TLSStatus.build(hostname, certificate)
+      else
+        {
+          state:       'critical',
+          description: @certificate_failure || "#{hostname} does not have a valid certificate",
+        }
+      end.merge(
+        service: service,
+        ttl:     3600 * 12,
+        tags:    ['tls-checker'],
+      )
     end
 
     def to_s
@@ -62,70 +53,6 @@ module TLSChecker
       else
         @address.to_s
       end
-    end
-
-    def description
-      return @certificate_failure || "#{hostname} does not have a valid certificate" unless certificate
-      return 'certificate subject does not match hostname' unless valid_for_domain?
-      return "certificate will become valid in #{distance_of_time_in_words_to_now(certificate.not_before)}" if not_valid_yet? # rubocop:disable Metrics/LineLength
-      return "certificate has expired #{distance_of_time_in_words_to_now(certificate.not_after)} ago" if expired?
-
-      "certificate will expire in #{distance_of_time_in_words_to_now(certificate.not_after)}"
-    end
-
-    def state
-      if !valid_for_domain? || not_valid_yet? || expired_or_expire_soon?
-        'critical'
-      elsif expire_soonish?
-        'warn'
-      else
-        'ok'
-      end
-    end
-
-    def metric
-      certificate.not_after - now if certificate
-    end
-
-    def now
-      Now.instance.now
-    end
-
-    def not_valid_yet?
-      now < certificate.not_before
-    end
-
-    def expired?
-      now > certificate&.not_after
-    end
-
-    def expired_or_expire_soon?
-      now + 3600 * 24 * 2 > certificate&.not_after
-    end
-
-    def expire_soonish?
-      now + 3600 * 24 * 14 > certificate&.not_after
-    end
-
-    def valid_for_domain?
-      match_domain? || match_subject_alternative_name?
-    end
-
-    def match_domain?
-      domain == hostname
-    end
-
-    def match_subject_alternative_name?
-      return false unless certificate
-
-      san = certificate.extensions.select { |ext| ext.oid == 'subjectAltName' }.first
-      return san.value.split(', ').map { |name| name.sub(/\ADNS:/, '') }.include?(hostname) if san
-
-      false
-    end
-
-    def domain
-      certificate.subject.to_a.select { |data| data[0] == 'CN' }.map { |data| data[1] }.first if certificate
     end
 
     def certificate
