@@ -76,14 +76,9 @@ module TLSChecker
     end
 
     def basic_socket
-      ssl_socket = OpenSSL::SSL::SSLSocket.new(TCPSocket.new(@address.to_s, port), ssl_context)
-      ssl_socket.hostname = hostname
-      begin
-        ssl_socket.connect
-      rescue OpenSSL::SSL::SSLError # rubocop:disable Lint/HandleExceptions
-        # This may fail for example if a client certificate is required
-      end
-      ssl_socket
+      socket = TCPSocket.new(@address.to_s, port)
+
+      ssl_socket(socket)
     end
 
     def imap_socket
@@ -94,9 +89,7 @@ module TLSChecker
       socket.puts('. STARTTLS')
       socket.gets_until_match(/^\. OK/)
 
-      ssl_socket = OpenSSL::SSL::SSLSocket.new(socket, ssl_context)
-      ssl_socket.connect
-      ssl_socket
+      ssl_socket(socket)
     end
 
     def ldap_socket
@@ -107,9 +100,7 @@ module TLSChecker
 
       return nil unless res == expected_res
 
-      ssl_socket = OpenSSL::SSL::SSLSocket.new(socket, ssl_context)
-      ssl_socket.connect
-      ssl_socket
+      ssl_socket(socket)
     end
 
     def smtp_socket
@@ -120,8 +111,17 @@ module TLSChecker
       socket.puts('STARTTLS')
       socket.gets
 
+      ssl_socket(socket)
+    end
+
+    def ssl_socket(socket)
       ssl_socket = OpenSSL::SSL::SSLSocket.new(socket, ssl_context)
-      ssl_socket.connect
+      ssl_socket.hostname = hostname
+      begin
+        ssl_socket.connect
+      rescue OpenSSL::SSL::SSLError # rubocop:disable Lint/HandleExceptions
+        # This may fail for example if a client certificate is required
+      end
       ssl_socket
     end
 
