@@ -2,7 +2,6 @@
 
 require 'openssl'
 require 'resolv'
-require 'net/ldap'
 require 'internet_security_event'
 
 module TLSChecker
@@ -58,7 +57,7 @@ module TLSChecker
     def certificate
       @certificate = OpenSSL::X509::Certificate.new(tls_socket.peer_cert) if @certificate.nil?
       @certificate
-    rescue Errno::ECONNREFUSED, Errno::ETIMEDOUT, Net::LDAP::ConnectionRefusedError, SocketRecvTimeout => e
+    rescue Errno::ECONNREFUSED, Errno::ETIMEDOUT, SocketRecvTimeout => e
       @certificate_failure = e.message
       @certificate = false
     end
@@ -101,11 +100,16 @@ module TLSChecker
     end
 
     def ldap_socket
-      ldap = Net::LDAP.new(host: @address.to_s, port: port, encryption: { method: :start_tls, tls_options: tls_options })
+      socket = TCPSocket.new(@address.to_s, port)
+      socket.write(['301d02010177188016312e332e362e312e342e312e313436362e3230303337'].pack('H*'))
+      expected_res = ['300c02010178070a010004000400'].pack('H*')
+      res = socket.read(expected_res.length)
 
-      ldap.open do |conn|
-        return conn.instance_variable_get(:@open_connection).instance_variable_get(:@conn)
-      end
+      return nil unless res == expected_res
+
+      ssl_socket = OpenSSL::SSL::SSLSocket.new(socket, ssl_context)
+      ssl_socket.connect
+      ssl_socket
     end
 
     def smtp_socket
