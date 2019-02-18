@@ -65,23 +65,23 @@ module TLSChecker
     def tls_socket
       @tls_socket ||= case starttls
                       when :smtp
-                        smtp_socket
+                        smtp_tls_socket
                       when :imap
-                        imap_socket
+                        imap_tls_socket
                       when :ldap
-                        ldap_socket
+                        ldap_tls_socket
                       else
-                        basic_socket
+                        raw_tls_socket
                       end
     end
 
-    def basic_socket
+    def raw_tls_socket
       socket = TCPSocket.new(@address.to_s, port)
 
-      ssl_socket(socket)
+      tls_handshake(socket)
     end
 
-    def imap_socket
+    def imap_tls_socket
       socket = LineOrientedSocket.new(@address.to_s, port)
       socket.gets_until_match(/^\* OK/)
       socket.puts('. CAPABILITY')
@@ -89,10 +89,10 @@ module TLSChecker
       socket.puts('. STARTTLS')
       socket.gets_until_match(/^\. OK/)
 
-      ssl_socket(socket)
+      tls_handshake(socket)
     end
 
-    def ldap_socket
+    def ldap_tls_socket
       socket = TCPSocket.new(@address.to_s, port)
       socket.write(['301d02010177188016312e332e362e312e342e312e313436362e3230303337'].pack('H*'))
       expected_res = ['300c02010178070a010004000400'].pack('H*')
@@ -100,10 +100,10 @@ module TLSChecker
 
       return nil unless res == expected_res
 
-      ssl_socket(socket)
+      tls_handshake(socket)
     end
 
-    def smtp_socket
+    def smtp_tls_socket
       socket = LineOrientedSocket.new(@address.to_s, port)
       socket.gets_until_match(/^220 /)
       socket.puts("EHLO #{my_hostname}")
@@ -111,18 +111,18 @@ module TLSChecker
       socket.puts('STARTTLS')
       socket.gets
 
-      ssl_socket(socket)
+      tls_handshake(socket)
     end
 
-    def ssl_socket(socket)
-      ssl_socket = OpenSSL::SSL::SSLSocket.new(socket, ssl_context)
-      ssl_socket.hostname = hostname
+    def tls_handshake(raw_socket)
+      tls_socket = OpenSSL::SSL::SSLSocket.new(raw_socket, ssl_context)
+      tls_socket.hostname = hostname
       begin
-        ssl_socket.connect
+        tls_socket.connect
       rescue OpenSSL::SSL::SSLError # rubocop:disable Lint/HandleExceptions
         # This may fail for example if a client certificate is required
       end
-      ssl_socket
+      tls_socket
     end
 
     def my_hostname
