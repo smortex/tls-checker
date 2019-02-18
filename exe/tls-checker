@@ -1,12 +1,26 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'json'
+require 'optparse'
 require 'tls-checker'
 
 factory = TLSChecker::CertificateCheckerFactory.new
 
+options = {
+  output: $stdout,
+}
+
+OptionParser.new do |opts|
+  opts.banner = 'Usage: tls-checker [options] specification...'
+
+  opts.on('-o', '--output=FILE', 'Write to FILE') do |f|
+    options[:output] = File.open(f, File::CREAT | File::APPEND | File::LOCK_EX)
+  end
+end.parse!
+
 ARGV.each do |arg|
   factory.certificate_checkers_for(arg).each do |checker|
-    puts checker.to_e
+    options[:output].puts checker.to_e.to_json
   end
 end
