@@ -45,7 +45,7 @@ RSpec.describe TLSChecker::CertificateChecker do
       let(:specification) { 'opus-labs.fr' }
 
       it 'fetches a certificate' do
-        expect(subject.send(:certificate)).to be_a(OpenSSL::X509::Certificate)
+        expect(subject.certificate).to be_a(OpenSSL::X509::Certificate)
       end
     end
 
@@ -53,7 +53,7 @@ RSpec.describe TLSChecker::CertificateChecker do
       let(:specification) { 'imap.opus-labs.fr' }
 
       it 'fetches a certificate' do
-        expect(subject.send(:certificate)).to be_a(OpenSSL::X509::Certificate)
+        expect(subject.certificate).to be_a(OpenSSL::X509::Certificate)
       end
     end
 
@@ -61,7 +61,7 @@ RSpec.describe TLSChecker::CertificateChecker do
       let(:specification) { 'ldap.opus-labs.fr' }
 
       it 'fetches a certificate' do
-        expect(subject.send(:certificate)).to be_a(OpenSSL::X509::Certificate)
+        expect(subject.certificate).to be_a(OpenSSL::X509::Certificate)
       end
     end
 
@@ -83,7 +83,7 @@ RSpec.describe TLSChecker::CertificateChecker do
       end
 
       it 'fetches a certificate' do
-        expect(subject.send(:certificate)).to be_a(OpenSSL::X509::Certificate)
+        expect(subject.certificate).to be_a(OpenSSL::X509::Certificate)
       end
     end
   end
