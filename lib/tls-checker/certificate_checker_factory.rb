@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'ipaddr'
+
 module TLSChecker
   class CertificateCheckerFactory
     def initialize
@@ -14,7 +16,16 @@ module TLSChecker
 
       port ||= port_for(hostname)
       starttls ||= starttls_for(port)
-      @resolver.getaddresses(hostname).map { |ip| CertificateChecker.new(hostname, ip, port, starttls) }
+
+      begin
+        ip_in_hostname = IPAddr.new(hostname)
+
+        [
+          CertificateChecker.new(nil, ip_in_hostname, port, starttls),
+        ]
+      rescue IPAddr::InvalidAddressError
+        @resolver.getaddresses(hostname).map { |ip| CertificateChecker.new(hostname, ip, port, starttls) }
+      end
     end
 
     private
