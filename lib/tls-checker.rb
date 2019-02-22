@@ -3,3 +3,5 @@
 require 'tls-checker/certificate_checker'
 require 'tls-checker/certificate_checker_factory'
 require 'tls-checker/line_oriented_socket'
+require 'tls-checker/tlsa_checker'
+require 'tls-checker/tlsa_checker_factory'
