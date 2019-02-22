@@ -48,11 +48,11 @@ module TLSChecker
       @certificate = false
     end
 
-    private
-
     def service
-      format('X.509/%<hostname>s/%<address>s:%<port>d', hostname: hostname, address: humanized_address, port: port)
+      "X.509/#{hostname}/#{humanized_address}:#{port}"
     end
+
+    private
 
     def humanized_address
       if @address.is_a?(Resolv::IPv6)
