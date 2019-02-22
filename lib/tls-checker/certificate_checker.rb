@@ -31,7 +31,7 @@ module TLSChecker
         }
       end.merge(
         service: service,
-        ttl:     3600 * 12,
+        ttl:     12.hours,
         tags:    ['tls-checker'],
       )
     end
