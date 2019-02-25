@@ -9,9 +9,7 @@ module TLSChecker
     def tlsa_checkers_for(certificate_checker)
       res = []
 
-      each_tlsa_record(certificate_checker) do |record|
-        next unless record.end_entity?
-
+      each_tlsa_end_entity_record(certificate_checker) do |record|
         checker = TLSAChecker.new(record, certificate_checker)
         # Since a single domain may have different certificates on different
         # addresses, we are not interested in reporting failures here: a server
@@ -30,13 +28,21 @@ module TLSChecker
 
     private
 
+    def each_tlsa_end_entity_record(certificate_checker)
+      each_tlsa_record(certificate_checker) do |record|
+        next unless record.end_entity?
+
+        yield(record)
+      end
+    end
+
     def each_tlsa_record(certificate_checker)
       resource = "_#{certificate_checker.port}._tcp.#{certificate_checker.hostname}."
 
       @resolver.getresources(resource, Resolv::DNS::Resource::IN::ANY).each do |rr|
         # XXX: Should we check the RRSIG here, or can we assume that the resolver
         # should have failed if it could not verify the response?
-        next unless rr.class.name.match(/::Type52_Class1$/)
+        next unless rr.class.name == 'Resolv::DNS::Resource::Generic::Type52_Class1'
 
         record = Resolv::DNS::Resource::IN::TLSA.new(rr.data)
         yield(record)
