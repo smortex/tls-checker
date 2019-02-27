@@ -52,8 +52,6 @@ module TLSChecker
       "X.509/#{hostname}/#{humanized_address}:#{port}"
     end
 
-    private
-
     def humanized_address
       if @address.is_a?(Resolv::IPv6)
         "[#{@address}]"
@@ -61,6 +59,8 @@ module TLSChecker
         @address.to_s
       end
     end
+
+    private
 
     def tls_socket
       @tls_socket ||= case starttls

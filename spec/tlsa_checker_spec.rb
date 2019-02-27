@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe TLSChecker::TLSAChecker do
-  subject do
-    TLSChecker::TLSAChecker.new(record, certificate_checker)
-  end
+  let(:tlsa_checker) { TLSChecker::TLSAChecker.new(record, certificate_checker) }
 
   let(:record) do
     Resolv::DNS::Resource::IN::TLSA.new("\x03\x00\x01\x01\x5a\xd9\xa7\xcb\x61\x43\x17\x33\xb4\x83\xcd\x7e\x15\x5f\x38" \
@@ -16,11 +14,10 @@ RSpec.describe TLSChecker::TLSAChecker do
     checker
   end
 
-  it 'reports a correct state' do
-    expect(subject.to_e[:state]).to eq('ok')
-  end
+  describe '#to_e' do
+    subject { tlsa_checker.to_e }
 
-  it 'reports a correct service' do
-    expect(subject.to_e[:service]).to eq('X.509/mx.blogreen.org/[2001:DB8::25]:25/TLSA')
+    it { is_expected.to include(state: 'ok') }
+    it { is_expected.to include(service: 'X.509/mx.blogreen.org/[2001:DB8::25]:25/TLSA') }
   end
 end

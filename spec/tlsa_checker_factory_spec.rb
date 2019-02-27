@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe TLSChecker::TLSACheckerFactory do
-  subject do
-    TLSChecker::TLSACheckerFactory.new
-  end
+  let(:factory) { TLSChecker::TLSACheckerFactory.new }
 
   describe '#certificate_checkers_for' do
     let(:certificate_checker) do
@@ -13,13 +11,14 @@ RSpec.describe TLSChecker::TLSACheckerFactory do
     end
 
     before do
-      expect(subject.instance_variable_get('@resolver')).to receive(:getresources).with('_25._tcp.mx.blogreen.org.', Resolv::DNS::Resource::IN::ANY).and_call_original
+      expect(factory.instance_variable_get('@resolver')).to receive(:getresources).with('_25._tcp.mx.blogreen.org.', Resolv::DNS::Resource::IN::ANY).and_call_original
     end
 
-    it '' do
-      result = subject.tlsa_checkers_for(certificate_checker)
+    context '#tlsa_checkers_for' do
+      subject { factory.tlsa_checkers_for(certificate_checker) }
 
-      expect(result.size).to eq(1)
+      it { is_expected.to be_an(Array) }
+      it { is_expected.to have_attributes(size: 1) }
     end
   end
 end

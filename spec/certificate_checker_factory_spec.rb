@@ -1,107 +1,139 @@
 # frozen_string_literal: true
 
 RSpec.describe TLSChecker::CertificateCheckerFactory do
+  let(:factory) { TLSChecker::CertificateCheckerFactory.new }
+
   describe '#certificate_checkers_for' do
     let(:hostname) { 'example.com' }
     let(:specification) { hostname }
+    let(:result) { factory.certificate_checkers_for(specification) }
+    subject { result }
 
     before do
-      expect(subject.instance_variable_get('@resolver')).to receive(:getaddresses).with(hostname).and_return([:ip])
+      expect(factory.instance_variable_get('@resolver')).to receive(:getaddresses).with(hostname).and_return([:ip])
     end
 
     context 'with a random hostname' do
-      it 'has proper port and starttls' do
+      before do
         expect(TLSChecker::CertificateChecker).to receive(:new).with('example.com', :ip, 443, :raw).and_call_original
+      end
 
-        result = subject.certificate_checkers_for(specification)
+      it { is_expected.to be_an(Array) }
+      it { is_expected.to have_attributes(size: 1) }
 
-        expect(result.size).to eq(1)
-        expect(result[0].port).to eq(443)
-        expect(result[0].starttls).to eq(:raw)
+      context 'first item' do
+        subject { result[0] }
+
+        it { is_expected.to have_attributes(port: 443) }
+        it { is_expected.to have_attributes(starttls: :raw) }
       end
     end
 
     context 'with a SMTP hostname' do
       let(:hostname) { 'smtp.example.com' }
 
-      it 'has proper port and starttls' do
+      before do
         expect(TLSChecker::CertificateChecker).to receive(:new).with('smtp.example.com', :ip, 25, :smtp).and_call_original
+      end
 
-        result = subject.certificate_checkers_for(specification)
+      it { is_expected.to be_an(Array) }
+      it { is_expected.to have_attributes(size: 1) }
 
-        expect(result.size).to eq(1)
-        expect(result[0].port).to eq(25)
-        expect(result[0].starttls).to eq(:smtp)
+      context 'first item' do
+        subject { result[0] }
+
+        it { is_expected.to have_attributes(port: 25) }
+        it { is_expected.to have_attributes(starttls: :smtp) }
       end
     end
 
     context 'with an IMAP hostname' do
       let(:hostname) { 'imap.example.com' }
 
-      it 'has proper port and starttls' do
+      before do
         expect(TLSChecker::CertificateChecker).to receive(:new).with('imap.example.com', :ip, 143, :imap).and_call_original
+      end
 
-        result = subject.certificate_checkers_for(specification)
+      it { is_expected.to be_an(Array) }
+      it { is_expected.to have_attributes(size: 1) }
 
-        expect(result.size).to eq(1)
-        expect(result[0].port).to eq(143)
-        expect(result[0].starttls).to eq(:imap)
+      context 'first item' do
+        subject { result[0] }
+
+        it { is_expected.to have_attributes(port: 143) }
+        it { is_expected.to have_attributes(starttls: :imap) }
       end
     end
 
     context 'with a LDAP hostname' do
       let(:hostname) { 'ldap.example.com' }
 
-      it 'has proper port and starttls' do
+      before do
         expect(TLSChecker::CertificateChecker).to receive(:new).with('ldap.example.com', :ip, 389, :ldap).and_call_original
+      end
 
-        result = subject.certificate_checkers_for(specification)
+      it { is_expected.to be_an(Array) }
+      it { is_expected.to have_attributes(size: 1) }
 
-        expect(result.size).to eq(1)
-        expect(result[0].port).to eq(389)
-        expect(result[0].starttls).to eq(:ldap)
+      context 'first item' do
+        subject { result[0] }
+
+        it { is_expected.to have_attributes(port: 389) }
+        it { is_expected.to have_attributes(starttls: :ldap) }
       end
     end
 
     context 'with a Puppet hostname' do
       let(:hostname) { 'puppet.example.com' }
 
-      it 'has proper port and starttls' do
+      before do
         expect(TLSChecker::CertificateChecker).to receive(:new).with('puppet.example.com', :ip, 8140, :raw).and_call_original
+      end
 
-        result = subject.certificate_checkers_for(specification)
+      it { is_expected.to be_an(Array) }
+      it { is_expected.to have_attributes(size: 1) }
 
-        expect(result.size).to eq(1)
-        expect(result[0].port).to eq(8140)
-        expect(result[0].starttls).to eq(:raw)
+      context 'first item' do
+        subject { result[0] }
+
+        it { is_expected.to have_attributes(port: 8140) }
+        it { is_expected.to have_attributes(starttls: :raw) }
       end
     end
 
     context 'with a hostname and a port' do
       let(:specification) { "#{hostname}:25" }
 
-      it 'has proper port and starttls' do
+      before do
         expect(TLSChecker::CertificateChecker).to receive(:new).with('example.com', :ip, 25, :smtp).and_call_original
+      end
 
-        result = subject.certificate_checkers_for(specification)
+      it { is_expected.to be_an(Array) }
+      it { is_expected.to have_attributes(size: 1) }
 
-        expect(result.size).to eq(1)
-        expect(result[0].port).to eq(25)
-        expect(result[0].starttls).to eq(:smtp)
+      context 'first item' do
+        subject { result[0] }
+
+        it { is_expected.to have_attributes(port: 25) }
+        it { is_expected.to have_attributes(starttls: :smtp) }
       end
     end
 
     context 'with a hostname, a port and starttls settings' do
       let(:specification) { "#{hostname}:224:smtp" }
 
-      it 'has proper port and starttls' do
+      before do
         expect(TLSChecker::CertificateChecker).to receive(:new).with('example.com', :ip, 224, :smtp).and_call_original
+      end
 
-        result = subject.certificate_checkers_for(specification)
+      it { is_expected.to be_an(Array) }
+      it { is_expected.to have_attributes(size: 1) }
 
-        expect(result.size).to eq(1)
-        expect(result[0].port).to eq(224)
-        expect(result[0].starttls).to eq(:smtp)
+      context 'first item' do
+        subject { result[0] }
+
+        it { is_expected.to have_attributes(port: 224) }
+        it { is_expected.to have_attributes(starttls: :smtp) }
       end
     end
   end

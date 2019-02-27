@@ -24,52 +24,39 @@ RSpec.describe TLSChecker::CertificateChecker do
     context 'with IPv4' do
       let(:address) { Resolv::IPv4.create('128.66.0.1') }
 
-      it 'returns the ipaddress as a string' do
-        expect(subject.send(:humanized_address)).to eq('128.66.0.1')
-      end
+      it { is_expected.to have_attributes(humanized_address: '128.66.0.1') }
     end
 
     context 'with IPv6' do
-      it 'returns the ipaddress as a string with square brackets' do
-        expect(subject.send(:humanized_address)).to eq('[2001:DB8::1]')
-      end
+      it { is_expected.to have_attributes(humanized_address: '[2001:DB8::1]') }
     end
   end
 
   context '#certificate' do
-    subject do
-      TLSChecker::CertificateCheckerFactory.new.certificate_checkers_for(specification).first
-    end
+    let(:checker) { TLSChecker::CertificateCheckerFactory.new.certificate_checkers_for(specification).first }
+    subject { checker.certificate }
 
-    context 'connecting to a TLS service' do
+    context 'when connecting to a TLS service' do
       let(:specification) { 'opus-labs.fr' }
 
-      it 'fetches a certificate' do
-        expect(subject.certificate).to be_a(OpenSSL::X509::Certificate)
-      end
+      it { is_expected.to be_an(OpenSSL::X509::Certificate) }
     end
 
-    context 'connecting to an IMAP server' do
+    context 'when connecting to an IMAP server' do
       let(:specification) { 'imap.opus-labs.fr' }
 
-      it 'fetches a certificate' do
-        expect(subject.certificate).to be_a(OpenSSL::X509::Certificate)
-      end
+      it { is_expected.to be_an(OpenSSL::X509::Certificate) }
     end
 
-    context 'connecting to a LDAP server' do
+    context 'when connecting to a LDAP server' do
       let(:specification) { 'ldap.opus-labs.fr' }
 
-      it 'fetches a certificate' do
-        expect(subject.certificate).to be_a(OpenSSL::X509::Certificate)
-      end
+      it { is_expected.to be_an(OpenSSL::X509::Certificate) }
     end
 
-    context 'connecting to a SMTP server' do
+    context 'when connecting to a SMTP server' do
       let(:specification) { '127.0.0.1:2525:smtp' }
-      subject do
-        TLSChecker::CertificateChecker.new('random.fqdn', '127.0.0.1', 2525, :smtp)
-      end
+      let(:checker) { TLSChecker::CertificateChecker.new('random.fqdn', '127.0.0.1', 2525, :smtp) }
 
       before do
         logger = Logger.new(STDOUT)
@@ -82,9 +69,7 @@ RSpec.describe TLSChecker::CertificateChecker do
         @server.stop
       end
 
-      it 'fetches a certificate' do
-        expect(subject.certificate).to be_a(OpenSSL::X509::Certificate)
-      end
+      it { is_expected.to be_an(OpenSSL::X509::Certificate) }
     end
   end
 end
