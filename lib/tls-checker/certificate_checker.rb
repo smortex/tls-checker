@@ -41,7 +41,7 @@ module TLSChecker
     def certificate
       @certificate = OpenSSL::X509::Certificate.new(tls_socket.peer_cert) if @certificate.nil?
       @certificate
-    rescue Errno::ECONNREFUSED, Errno::ETIMEDOUT, SocketRecvTimeout => e
+    rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::ETIMEDOUT, SocketRecvTimeout => e
       @certificate_failure = e.message
       @certificate = false
     end
