@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'logger'
 require 'midi-smtp-server'
 
 RSpec.describe TLSChecker::CertificateChecker do

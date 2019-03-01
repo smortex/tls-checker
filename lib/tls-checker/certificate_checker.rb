@@ -6,8 +6,6 @@ require 'internet_security_event'
 
 module TLSChecker
   class CertificateChecker
-    include ActionView::Helpers::DateHelper
-
     def initialize(hostname, address, port, starttls)
       @hostname = hostname
       @address = address
