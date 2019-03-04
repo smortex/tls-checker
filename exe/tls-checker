@@ -5,8 +5,6 @@ require 'json'
 require 'optparse'
 require 'tls-checker'
 
-factory = TLSChecker::CertificateCheckerFactory.new
-
 options = {
   output: $stdout,
 }
@@ -19,8 +17,10 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-ARGV.each do |arg|
-  factory.certificate_checkers_for(arg).each do |checker|
+factory = TLSChecker::CertificateCheckerFactory.new
+
+ARGV.each do |specification|
+  factory.certificate_checkers_for(specification).each do |checker|
     options[:output].puts checker.to_e.to_json
   end
 end
