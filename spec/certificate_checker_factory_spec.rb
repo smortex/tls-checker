@@ -5,6 +5,7 @@ RSpec.describe TLSChecker::CertificateCheckerFactory do
 
   before do
     expect_any_instance_of(TLSChecker::CertificateChecker).to receive(:check).and_return(true)
+    expect_any_instance_of(TLSChecker::TLSACheckerFactory).to receive(:tlsa_checkers_for).and_return([])
   end
 
   describe '#certificate_checkers_for' do

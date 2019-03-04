@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Skip completely TLSA check if a connexion certificate cannot be fetched;
 - Do not generate an event when a connexion to a remote service is not
   possible.
 

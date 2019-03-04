@@ -8,6 +8,7 @@ module TLSChecker
 
     def tlsa_checkers_for(certificate_checker)
       res = []
+      return res unless certificate_checker.certificate
 
       each_tlsa_end_entity_record(certificate_checker) do |record|
         checker = TLSAChecker.new(record, certificate_checker)
