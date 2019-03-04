@@ -3,6 +3,10 @@
 RSpec.describe TLSChecker::CertificateCheckerFactory do
   let(:factory) { TLSChecker::CertificateCheckerFactory.new }
 
+  before do
+    expect_any_instance_of(TLSChecker::CertificateChecker).to receive(:check).and_return(true)
+  end
+
   describe '#certificate_checkers_for' do
     let(:hostname) { 'example.com' }
     let(:specification) { hostname }

@@ -34,6 +34,10 @@ module TLSChecker
       )
     end
 
+    def check
+      !!certificate
+    end
+
     def to_s
       description
     end
