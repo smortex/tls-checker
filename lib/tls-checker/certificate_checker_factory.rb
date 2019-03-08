@@ -25,12 +25,13 @@ module TLSChecker
         ]
       rescue IPAddr::InvalidAddressError
         certificate_checkers = @resolver.getaddresses(hostname).map { |ip| CertificateChecker.new(hostname, ip, port, starttls) }
-        certificate_checkers.select!(&:check)
 
         factory = TLSACheckerFactory.new
 
         tlsa_checkers = []
         certificate_checkers.each do |certificate_checker|
+          next unless certificate_checker.check
+
           tlsa_checkers += factory.tlsa_checkers_for(certificate_checker)
         end
 

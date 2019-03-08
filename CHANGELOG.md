@@ -5,13 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Revert to the pre-1.2.0 behavior when a remote service is not reachable and
+  emit a critical event.
+
 ## [1.2.0]
+
+### Changed
 
 - Skip completely TLSA check if a connexion certificate cannot be fetched;
 - Do not generate an event when a connexion to a remote service is not
   possible.
 
 ## [1.1.1]
+
+### Changed
 
 - Handle Errno::EHOSTUNREACH exceptions gracefully when attempting to fetch a
   certificate.
