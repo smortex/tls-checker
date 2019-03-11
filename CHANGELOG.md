@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- New metadata in generated events: af (address fanily, one of 'inet' and
+  'inet6'), hostname, address and port.
+
 ### Changed
 
 - Ensure events' ttl is an Integer.

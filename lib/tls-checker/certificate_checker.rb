@@ -28,9 +28,13 @@ module TLSChecker
           description: @certificate_failure || "#{hostname} does not have a valid certificate",
         }
       end.merge(
-        service: service,
-        ttl:     12.hours.to_i,
-        tags:    ['tls-checker'],
+        service:  service,
+        af:       af,
+        hostname: hostname,
+        address:  address.to_s,
+        port:     port,
+        ttl:      12.hours.to_i,
+        tags:     ['tls-checker'],
       )
     end
 
@@ -63,6 +67,15 @@ module TLSChecker
     end
 
     private
+
+    def af
+      case @address
+      when Resolv::IPv4
+        'inet'
+      when Resolv::IPv6
+        'inet6'
+      end
+    end
 
     def tls_socket
       @tls_socket ||= case starttls
