@@ -5,8 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.4.0]
+## [Unreleased]
+## Fixed
 
+- Fix `--version`.
+
+## [1.4.0]
 ### Added
 
 - New metadata in generated events: af (address fanily, one of 'inet' and
@@ -17,14 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure events' ttl is an Integer.
 
 ## [1.3.0]
-
 ### Changed
 
 - Revert to the pre-1.2.0 behavior when a remote service is not reachable and
   emit a critical event.
 
 ## [1.2.0]
-
 ### Changed
 
 - Skip completely TLSA check if a connexion certificate cannot be fetched;
@@ -32,14 +34,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   possible.
 
 ## [1.1.1]
-
 ### Changed
 
 - Handle Errno::EHOSTUNREACH exceptions gracefully when attempting to fetch a
   certificate.
 
 ## [1.1.0]
-
 ### Added
 
 - Make it possible to test services using an IP address;

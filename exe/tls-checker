@@ -11,6 +11,7 @@ options = {
 
 OptionParser.new do |opts|
   opts.banner = 'Usage: tls-checker [options] specification...'
+  opts.version = TLSChecker::VERSION
 
   opts.on('-o', '--output=FILE', 'Write to FILE') do |f|
     options[:output] = File.open(f, File::CREAT | File::APPEND | File::LOCK_EX)

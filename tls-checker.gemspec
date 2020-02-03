@@ -6,7 +6,7 @@ require 'tls-checker/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'tls-checker'
-  spec.version       = TlsChecker::VERSION
+  spec.version       = TLSChecker::VERSION
   spec.authors       = ['Romain Tartière']
   spec.email         = ['romain@blogreen.org']
 
