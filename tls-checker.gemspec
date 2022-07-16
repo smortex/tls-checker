@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'internet_security_event', '~> 2.0'
 
   spec.add_development_dependency 'bundler'
+  spec.add_development_dependency 'github_changelog_generator'
   spec.add_development_dependency 'midi-smtp-server'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec'
