@@ -8,7 +8,7 @@ module TLSChecker
       @resolver = Resolv::DNS.new
     end
 
-    def certificate_checkers_for(specification)
+    def certificate_checkers_for(specification) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
       hostname, port, starttls = specification.split(':', 3)
 
       port = port.to_i if port

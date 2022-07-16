@@ -36,11 +36,9 @@ module TLSChecker
     def timed_getbyte
       recv_nonblock(1)
     rescue IO::EAGAINWaitReadable
-      if IO.select([self], nil, nil, 10)
-        recv_nonblock(1)
-      else
-        raise SocketRecvTimeout
-      end
+      raise SocketRecvTimeout unless IO.select([self], nil, nil, 10)
+
+      recv_nonblock(1)
     end
   end
 end

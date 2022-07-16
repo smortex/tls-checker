@@ -43,7 +43,7 @@ module TLSChecker
       @resolver.getresources(resource, Resolv::DNS::Resource::IN::ANY).each do |rr|
         # XXX: Should we check the RRSIG here, or can we assume that the resolver
         # should have failed if it could not verify the response?
-        next unless rr.class.name == 'Resolv::DNS::Resource::Generic::Type52_Class1'
+        next unless rr.instance_of?(Resolv::DNS::Resource::Generic::Type52_Class1)
 
         record = Resolv::DNS::Resource::IN::TLSA.new(rr.data)
         yield(record)

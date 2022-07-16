@@ -1,6 +1,6 @@
 # tls-checker
 
-[![Build Status](https://travis-ci.com/smortex/tls-checker.svg?branch=master)](https://travis-ci.com/smortex/tls-checker)
+[![Build Status](https://github.com/smortex/tls-checker/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/smortex/tls-checker/actions/workflows/ci.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/272ab98a6ec1b28e5f7d/maintainability)](https://codeclimate.com/github/smortex/tls-checker/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/272ab98a6ec1b28e5f7d/test_coverage)](https://codeclimate.com/github/smortex/tls-checker/test_coverage)
 
@@ -52,4 +52,4 @@ License](https://opensource.org/licenses/MIT).
 
 Everyone interacting in the tls-checker project’s codebases, issue trackers,
 chat rooms and mailing lists is expected to follow the [code of
-conduct](https://github.com/smortex/tls-checker/blob/master/CODE_OF_CONDUCT.md).
+conduct](https://github.com/smortex/tls-checker/blob/main/CODE_OF_CONDUCT.md).

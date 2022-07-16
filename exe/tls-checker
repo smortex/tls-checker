@@ -3,7 +3,7 @@
 
 require 'json'
 require 'optparse'
-require 'tls-checker'
+require 'tls_checker'
 
 options = {
   output: $stdout,

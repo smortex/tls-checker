@@ -19,7 +19,7 @@ module TLSChecker
 
     attr_reader :hostname, :address, :port, :starttls
 
-    def to_e
+    def to_e # rubocop:disable Metrics/MethodLength
       if certificate
         InternetSecurityEvent::TLSStatus.build(hostname, certificate)
       else
@@ -134,14 +134,14 @@ module TLSChecker
       tls_socket.hostname = hostname
       begin
         tls_socket.connect
-      rescue OpenSSL::SSL::SSLError # rubocop:disable Lint/HandleExceptions
+      rescue OpenSSL::SSL::SSLError
         # This may fail for example if a client certificate is required
       end
       tls_socket
     end
 
     def my_hostname
-      Socket.gethostbyname(Socket.gethostname).first
+      Addrinfo.tcp(Socket.gethostname, 8023).getnameinfo.first
     rescue SocketError
       Socket.gethostname
     end
