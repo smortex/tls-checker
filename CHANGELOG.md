@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.0.1](https://github.com/smortex/tls-checker/tree/v2.0.1) (2022-07-16)
+
+[Full Changelog](https://github.com/smortex/tls-checker/compare/v2.0.0...v2.0.1)
+
+**Fixed bugs:**
+
+- Detect TLS handshake failures [\#4](https://github.com/smortex/tls-checker/pull/4) ([smortex](https://github.com/smortex))
+
 ## [v2.0.0](https://github.com/smortex/tls-checker/tree/v2.0.0) (2022-07-16)
 
 [Full Changelog](https://github.com/smortex/tls-checker/compare/v1.4.0...v2.0.0)
