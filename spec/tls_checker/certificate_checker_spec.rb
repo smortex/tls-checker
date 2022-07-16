@@ -29,7 +29,7 @@ RSpec.describe TLSChecker::CertificateChecker do
     end
 
     context 'with IPv6' do
-      it { is_expected.to have_attributes(humanized_address: /[2001:db8::1]/i) }
+      it { is_expected.to have_attributes(humanized_address: /\A\[2001:db8::1\]\z/i) }
     end
   end
 
