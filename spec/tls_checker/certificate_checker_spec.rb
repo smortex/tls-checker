@@ -38,6 +38,12 @@ RSpec.describe TLSChecker::CertificateChecker do
 
     let(:checker) { TLSChecker::CertificateCheckerFactory.new.certificate_checkers_for(specification).first }
 
+    context 'when connecting to an unencrypted service' do
+      let(:specification) { 'opus-labs.fr:80' }
+
+      it { is_expected.to be_falsey }
+    end
+
     context 'when connecting to a TLS service' do
       let(:specification) { 'opus-labs.fr' }
 
