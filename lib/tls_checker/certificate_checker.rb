@@ -55,8 +55,8 @@ module TLSChecker
         @certificate_failure = 'No peer certificate (TLS handshake failed?)'
         @certificate = false
       end
-    rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::ETIMEDOUT, SocketRecvTimeout => e
-      @certificate_failure = e.message
+    rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::ETIMEDOUT, SocketRecvTimeout, IO::TimeoutError => e
+      @certificate_failure = "#{e.class.name}: #{e.message}"
       @certificate = false
     end
 
