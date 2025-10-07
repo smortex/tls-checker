@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.0.0](https://github.com/smortex/tls-checker/tree/v3.0.0) (2025-10-07)
+
+[Full Changelog](https://github.com/smortex/tls-checker/compare/v2.0.3...v3.0.0)
+
+**Breaking changes:**
+
+- Switch to internet\_security\_event 4.x [\#18](https://github.com/smortex/tls-checker/pull/18) ([smortex](https://github.com/smortex))
+
+**Implemented enhancements:**
+
+- Run CI on Ruby 3.4 [\#19](https://github.com/smortex/tls-checker/pull/19) ([smortex](https://github.com/smortex))
+
+**Merged pull requests:**
+
+- Bump actions/checkout from 4 to 5 [\#17](https://github.com/smortex/tls-checker/pull/17) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump paambaati/codeclimate-action from 8.0.0 to 9.0.0 [\#16](https://github.com/smortex/tls-checker/pull/16) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump paambaati/codeclimate-action from 6.0.0 to 8.0.0 [\#15](https://github.com/smortex/tls-checker/pull/15) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump paambaati/codeclimate-action from 5.0.0 to 6.0.0 [\#14](https://github.com/smortex/tls-checker/pull/14) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v2.0.3](https://github.com/smortex/tls-checker/tree/v2.0.3) (2024-01-01)
 
 [Full Changelog](https://github.com/smortex/tls-checker/compare/v2.0.2...v2.0.3)
