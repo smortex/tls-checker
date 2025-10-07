@@ -1,6 +1,5 @@
 AllCops:
   AllowSymlinksInCacheRootDirectory: true
-  TargetRubyVersion: 2.6
 
 plugins:
   - rubocop-rake
