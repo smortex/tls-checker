@@ -12,7 +12,7 @@ RSpec.describe TLSChecker::TLSACheckerFactory do
     let(:resolver) { factory.instance_variable_get('@resolver') }
 
     before do
-      allow(resolver).to receive(:getresources).with('_25._tcp.mx.blogreen.org.', Resolv::DNS::Resource::IN::ANY).and_call_original
+      allow(resolver).to receive(:getresources).with('_25._tcp.mx.blogreen.org.', Resolv::DNS::Resource::IN::TLSA).and_call_original
     end
 
     describe '#tlsa_checkers_for' do
