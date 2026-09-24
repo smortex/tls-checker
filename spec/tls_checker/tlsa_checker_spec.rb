@@ -4,8 +4,7 @@ RSpec.describe TLSChecker::TLSAChecker do
   let(:tlsa_checker) { described_class.new(record, certificate_checker) }
 
   let(:record) do
-    Resolv::DNS::Resource::IN::TLSA.new("\x03\x00\x01\x01\x5a\xd9\xa7\xcb\x61\x43\x17\x33\xb4\x83\xcd\x7e\x15\x5f\x38" \
-                                        "\xf7\xa7\x76\xfa\x0e\xf7\xf0\xed\x94\xda\x3c\xa8\xd8\x6c\x21\x0a")
+    Resolv::DNS::Resource::IN::TLSA.new(3, 1, 1, 'd8aac0d602e5532136ffb9e368fbc3c9a7a4b694340800b08731bcc09099a925')
   end
 
   let(:certificate_checker) do
