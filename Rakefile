@@ -15,7 +15,7 @@ GitHubChangelogGenerator::RakeTask.new :changelog do |config|
     The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
     and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   HEADER
-  config.exclude_labels = %w[duplicate question invalid wontfix wont-fix skip-changelog ignore]
+  config.exclude_labels = %w[dependencies duplicate question invalid wontfix wont-fix skip-changelog ignore]
   config.user = 'smortex'
   config.project = 'tls-checker'
   config.since_tag = 'v1.4.0'
